@@ -1,6 +1,6 @@
 {
-  "name": "openseo",
-  "displayName": "OpenSEO",
+  "name": "openseo-selfhost",
+  "displayName": "OpenSEO Self-Hosted",
   "version": "1.0.29",
   "description": "Research keywords and competitors, audit sites, track rankings and AI visibility, and use connected Search Console data from your AI assistant.",
   "author": {
@@ -10,8 +10,16 @@
   "homepage": "https://openseo.so",
   "privacyPolicyUrl": "https://openseo.so/privacy",
   "icon": "./assets/icon.png",
-  "repository": "https://github.com/every-app/open-seo",
+  "repository": "https://github.com/elohimito/open-seo",
   "license": "MIT",
+  "userConfig": {
+    "endpoint": {
+      "type": "string",
+      "title": "OpenSEO MCP URL",
+      "description": "Enter the full HTTPS URL of your self-hosted OpenSEO MCP server, including /mcp.",
+      "required": true
+    }
+  },
   "keywords": [
     "seo",
     "keyword-research",

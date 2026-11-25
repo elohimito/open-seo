@@ -1,57 +1,20 @@
-# OpenSEO for Grok Bot and Cursor
+# OpenSEO Self-Hosted for Claude Code
 
-SEO made simple.
+The plugin includes the upstream OpenSEO skills and connects to your own OpenSEO instance. Claude Code stores the endpoint you enter in your user configuration.
 
-OpenSEO gives your agent real SEO data and guided workflows, so its advice is grounded in your website instead of generic recommendations.
+Inside Claude Code, run:
 
-## What you can do
+```text
+/plugin marketplace add elohimito/open-seo#claude-selfhost-plugin
+/plugin install openseo-selfhost@openseo-selfhost
+/reload-plugins
+```
 
-- Find and evaluate keywords
-- Research competitors and content gaps
-- Audit a website and prioritize fixes
-- Analyze backlinks and find link prospects
-- Track organic and Google Maps rankings
-- Work with Google Search Console and Analytics data
-- Research AI prompts and track brand mentions, citations, and competitors
+Choose **User** scope to make the plugin available across projects. When prompted for **OpenSEO MCP URL**, enter the full HTTPS address of your instance, including `/mcp`. You can update it in `/config`.
 
-The plugin includes twelve skills that guide your agent through complete SEO workflows, plus the hosted OpenSEO MCP server for live data and project management.
+Open `/mcp`, select the OpenSEO server, and sign in. Cloudflare Access installations use the email in their Access policy and require Managed OAuth with loopback redirects enabled.
 
-## Connect
+Use the `list_projects` tool for a connection check without spending SEO research credits. The bundled skills appear under the `/openseo-selfhost:` namespace.
 
-Install OpenSEO from the Grok Bot or Cursor marketplace. The first time your agent uses an OpenSEO tool, follow the OAuth prompt to sign in and approve the connection. There is no API key to configure.
-
-To check the connection without using credits, ask: "Use OpenSEO to check my connection and list my projects."
-
-You need an OpenSEO account. The plugin package is free and open source. Hosted OpenSEO plans and usage credits are described at [openseo.so/pricing](https://openseo.so/pricing), and OpenSEO can also be [self-hosted](https://github.com/every-app/open-seo#self-hosting).
-
-## Try it
-
-- "Research keywords for my website and shortlist the best opportunities."
-- "Audit my website and tell me what to fix first."
-- "What does competitor.com rank for that I don't?"
-- "Which pages are close to ranking in Google Search Console?"
-- "Track my rankings for these keywords and summarize what changed."
-- "Help me choose prompts to track in AI answers, and show the cost first."
-
-## Included skills
-
-- AI prompt research
-- AI visibility audit
-- Competitive landscape
-- Competitor analysis
-- Keyword clustering
-- Keyword research
-- Link prospecting
-- Local SEO
-- SEO audit
-- SEO coach
-- SEO project setup
-- SEO report
-
-## Links
-
-- [OpenSEO](https://openseo.so)
-- [MCP documentation](https://openseo.so/docs/mcp)
-- [Privacy policy](https://openseo.so/privacy)
-- [Terms](https://openseo.so/terms-and-conditions)
-- [Support](https://openseo.so/support)
+- [Cloudflare Access and MCP setup](../../docs/SELF_HOSTING_CLOUDFLARE_OPERATIONS.md#connect-the-mcp-server)
+- [Upstream OpenSEO project](https://github.com/every-app/open-seo)

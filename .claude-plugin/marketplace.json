@@ -1,15 +1,15 @@
 {
-  "name": "openseo",
+  "name": "openseo-selfhost",
   "owner": {
-    "name": "OpenSEO",
-    "url": "https://openseo.so"
+    "name": "110 Marketing",
+    "url": "https://github.com/elohimito/open-seo"
   },
-  "description": "OpenSEO's official Claude Code plugin marketplace.",
+  "description": "Claude Code plugin for a self-hosted OpenSEO instance.",
   "plugins": [
     {
-      "name": "openseo",
+      "name": "openseo-selfhost",
       "source": "./plugins/openseo",
-      "description": "Without good data, your agent gives generic advice. Keyword research, competitor research, backlinks, and site audits. All for $10/month.",
+      "description": "Use your OpenSEO instance for keyword research, competitor analysis, backlinks, and SEO audits.",
       "category": "SEO"
     }
   ]
