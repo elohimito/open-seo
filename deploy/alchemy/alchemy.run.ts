@@ -157,10 +157,13 @@ const optionalVar = (name: string) =>
  * the deploy-created Access application protects it too. Hosted prod serves
  * its fixed domains instead.
  */
-const readCustomDomain = (prod: boolean) =>
+const readCustomDomain = (prod: boolean, defaultDomain: string) =>
   Effect.gen(function* () {
     if (prod) return "";
-    const domain = yield* optionalVar("CUSTOM_DOMAIN");
+    const domain = yield* Config.string("CUSTOM_DOMAIN").pipe(
+      Config.withDefault(defaultDomain),
+      Config.map((value) => value.trim()),
+    );
     if (domain && !/^[a-z0-9.-]+$/i.test(domain)) {
       return yield* Effect.die(
         new Error("CUSTOM_DOMAIN must be a bare hostname (seo.example.com)."),
@@ -474,7 +477,12 @@ export default Alchemy.Stack(
     }
     yield* requireDataForSeoCredentials(prod);
     const workersSubdomain = yield* readWorkersSubdomain({ required: false });
-    const customDomain = yield* readCustomDomain(prod);
+    const customDomain = yield* readCustomDomain(
+      prod,
+      stage === "selfhost" && authMode === "cloudflare_access"
+        ? "seo.110marketing.com"
+        : "",
+    );
 
     // Auth needs an absolute BETTER_AUTH_URL. Prod sets it explicitly;
     // previews always derive it from the deterministic worker name — a wrong

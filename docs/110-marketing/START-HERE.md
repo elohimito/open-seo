@@ -10,6 +10,8 @@ This fork uses the [upstream Cloudflare self-host deployment](../SELF_HOSTING_CL
 4. Run `corepack pnpm deploy:selfhost --yes` on the intended release. Confirm dashboard sign-in, the authenticated health endpoint, access rejection on the dashboard and MCP, and existing project history after redeployment. Verify the Access app still matches the deployed hostname and the Worker has Preview URLs disabled.
 5. Before merging upstream changes, review release notes, D1 migrations, and changes to Access and the provider gateway. Run `corepack pnpm test:ci`, the self-host build, and `corepack pnpm exec tsc --noEmit`. Deploy with the same Alchemy stack and stage to reuse resources. The pinned Alchemy release ties previews to the main Worker URL by default. This fork patches its Worker provider to honor `subdomain.previewsEnabled` separately. Check whether the upstream provider supports this setting before dropping the patch.
 
+Cloudflare Access deployments to the `selfhost` stage default to `seo.110marketing.com`. Set `CUSTOM_DOMAIN` explicitly to override the hostname. The default keeps the Worker custom domain and the Access application destination in the deployment plan.
+
 ### Backup and recovery
 
 Record a [D1 Time Travel bookmark](https://developers.cloudflare.com/d1/reference/time-travel/) and export D1 before a schema-changing deployment. Keep exports private. Copy valuable R2 artifacts separately. R2's provider cache can be rebuilt by research requests that may incur costs. Keep the Alchemy state store and deployment bootstrap credentials recoverable. Review restoration in a separate environment before touching live data. A Worker version rollback does not reverse D1 migrations. Upstream's destroy command deletes self-hosted resources and data.
