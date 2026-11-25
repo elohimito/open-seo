@@ -217,11 +217,32 @@ index c8ab1322347095c9f7cfda63c382c0b6ad17775d..7e311e120658debd792d45e99a2818d7
      return true;
  };
  //# sourceMappingURL=Application.js.map
+\ No newline at end of file
 diff --git a/lib/Cloudflare/Workers/WorkerProvider.js b/lib/Cloudflare/Workers/WorkerProvider.js
-index 5c4c4555cbbe92330341c470079addd7af5e94cb..e345bbbf0fe2224cf5a7cb0be989a0b30ef6e88b 100644
+index 5c4c4555cbbe92330341c470079addd7af5e94cb..9ae87acb76da36b420ad7ea567a808bd8474eedc 100644
 --- a/lib/Cloudflare/Workers/WorkerProvider.js
 +++ b/lib/Cloudflare/Workers/WorkerProvider.js
-@@ -364,9 +364,10 @@ export const LiveWorkerProvider = () => Provider.effect(Worker, Effect.gen(funct
+@@ -295,16 +295,14 @@ export const LiveWorkerProvider = () => Provider.effect(Worker, Effect.gen(funct
+     // Toggle the workers.dev subdomain via `POST /subdomain` with
+     // `enabled: true | false`. Mirrors the upstream Alchemy
+     // implementation in `.vendor/alchemy/.../worker-subdomain.ts`.
+-    // When enabling we also set `previewsEnabled: true` so the
+-    // script is reachable both at its stable workers.dev URL and at
+-    // version-preview URLs; on disable we send just `enabled: false`.
+-    const setWorkerSubdomain = Effect.fn(function* (name, enabled) {
++    // The stable workers.dev URL and version previews have separate settings.
++    const setWorkerSubdomain = Effect.fn(function* (name, enabled, previewsEnabled) {
+         const { accountId } = yield* yield* CloudflareEnvironment;
+         return yield* workers.createScriptSubdomain({
+             accountId,
+             scriptName: name,
+             enabled,
+-            previewsEnabled: enabled ? true : undefined,
++            previewsEnabled,
+         });
+     });
+     // Convert non-ASCII hostnames (emoji, IDN, etc.) to punycode so the
+@@ -364,9 +362,10 @@ export const LiveWorkerProvider = () => Provider.effect(Worker, Effect.gen(funct
          const cached = zoneCache.get(hostname);
          if (cached)
              return cached;
@@ -235,3 +256,29 @@ index 5c4c4555cbbe92330341c470079addd7af5e94cb..e345bbbf0fe2224cf5a7cb0be989a0b3
          for (const zone of zoneList) {
              zoneCache.set(zone.name, zone.id);
          }
+@@ -1140,6 +1139,7 @@ export const LiveWorkerProvider = () => Provider.effect(Worker, Effect.gen(funct
+         // Cloudflare currently has it (disabled by default, or whatever
+         // a previous failed/external action left it as).
+         const desiredSubdomainEnabled = news.url !== false;
++        const desiredPreviewsEnabled = desiredSubdomainEnabled && (news.subdomain?.previewsEnabled ?? true);
+         const observedSubdomain = yield* workers
+             .getScriptSubdomain({
+             accountId,
+@@ -1150,7 +1150,7 @@ export const LiveWorkerProvider = () => Provider.effect(Worker, Effect.gen(funct
+             previewsEnabled: false,
+         })));
+         if (desiredSubdomainEnabled !== observedSubdomain.enabled ||
+-            desiredSubdomainEnabled !== observedSubdomain.previewsEnabled) {
++            desiredPreviewsEnabled !== observedSubdomain.previewsEnabled) {
+             yield* session.note(`${desiredSubdomainEnabled ? "Enabling" : "Disabling"} workers.dev subdomain...`);
+             // Cloudflare's script registry is eventually consistent — for the
+             // first few hundred ms after `putScript` returns, POST /subdomain
+@@ -1160,7 +1160,7 @@ export const LiveWorkerProvider = () => Provider.effect(Worker, Effect.gen(funct
+             // Retry the subdomain toggle on those transient tags with a short
+             // exponential backoff; same pattern we use elsewhere in this
+             // provider for DO-namespace propagation and for `putScript` itself.
+-            yield* setWorkerSubdomain(name, desiredSubdomainEnabled).pipe(Effect.retry({
++            yield* setWorkerSubdomain(name, desiredSubdomainEnabled, desiredPreviewsEnabled).pipe(Effect.retry({
+                 while: (error) => error._tag === "WorkerNotFound" ||
+                     error._tag === "InternalServerError" ||
+                     error._tag === "UnknownCloudflareError",

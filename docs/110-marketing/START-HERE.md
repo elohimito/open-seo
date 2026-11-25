@@ -7,8 +7,8 @@ This fork uses the [upstream Cloudflare self-host deployment](../SELF_HOSTING_CL
 1. Use Node 22.6+ and the pnpm version in `package.json`. Install with `corepack pnpm install --frozen-lockfile`.
 2. Select the intended Cloudflare account. Access requires an active Zero Trust organization. Run the upstream Alchemy login with its default scopes plus `access:write`, or use a short-lived token restricted to the target account and the resource operations required by the stack. Use Alchemy for the state-store bootstrap and deployment.
 3. Start from `deploy/.env.selfhost.example`. Set `AUTH_MODE=cloudflare_access`, `ACCESS_ALLOWED_EMAILS`, and `OPENSEO_TELEMETRY_DISABLED=1`. Set the DataForSEO Base64 credential as `DATAFORSEO_API_KEY` in the ignored `.env.selfhost` file and restrict local file permissions. Alchemy writes the credential as a Worker secret. Keep its source in the operator's secret manager for redeploys.
-4. Run `corepack pnpm deploy:selfhost --yes` on the intended release. Confirm dashboard sign-in, the authenticated health endpoint, access rejection on the dashboard and MCP, and existing project history after redeployment. Verify the Access app still matches the deployed hostname and that Worker previews cannot expose data.
-5. Before merging upstream changes, review release notes, D1 migrations, and changes to Access and the provider gateway. Run `corepack pnpm test:ci`, the self-host build, and `corepack pnpm exec tsc --noEmit`. Deploy with the same Alchemy stack and stage to reuse resources.
+4. Run `corepack pnpm deploy:selfhost --yes` on the intended release. Confirm dashboard sign-in, the authenticated health endpoint, access rejection on the dashboard and MCP, and existing project history after redeployment. Verify the Access app still matches the deployed hostname and the Worker has Preview URLs disabled.
+5. Before merging upstream changes, review release notes, D1 migrations, and changes to Access and the provider gateway. Run `corepack pnpm test:ci`, the self-host build, and `corepack pnpm exec tsc --noEmit`. Deploy with the same Alchemy stack and stage to reuse resources. The pinned Alchemy release ties previews to the main Worker URL by default. This fork patches its Worker provider to honor `subdomain.previewsEnabled` separately. Check whether the upstream provider supports this setting before dropping the patch.
 
 ### Backup and recovery
 
@@ -22,7 +22,7 @@ Use `https://WORKER_HOSTNAME/mcp` for Streamable HTTP MCP. Let Cloudflare Access
 | --- | --- |
 | [Claude Code](https://code.claude.com/docs/en/mcp) | `claude mcp add --transport http openseo --scope user https://WORKER_HOSTNAME/mcp`, then authenticate under `/mcp`. |
 | [Codex CLI](https://developers.openai.com/codex/mcp) | `codex mcp add openseo --url https://WORKER_HOSTNAME/mcp`, then `codex mcp login openseo` if needed. |
-| [Cursor](https://cursor.com/docs/mcp) | Add `{"mcpServers":{"openseo":{"url":"https://WORKER_HOSTNAME/mcp"}}}` to the user MCP config and follow OAuth. Cursor can require its own documented HTTPS callback even from desktop. |
+| [Cursor](https://cursor.com/docs/mcp) | Add `{"mcpServers":{"openseo":{"url":"https://WORKER_HOSTNAME/mcp"}}}` to the user MCP config and follow OAuth. Dynamic registration can require `https://www.cursor.com/agents/mcp/oauth/callback` even from desktop. Allow that exact callback in the Access app. |
 | [ChatGPT](https://openseo.so/docs/chatgpt) | Create a private MCP app using the endpoint and OAuth. Copy the exact redirect URI displayed in the [app's management page](https://developers.openai.com/plugins/build/auth) to the Access app. |
 | Other clients | Select Streamable HTTP, then use an OAuth client that supports the Access resource parameter and the server's available registration method. |
 

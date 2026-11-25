@@ -606,6 +606,10 @@ export default Alchemy.Stack(
 
     const app = yield* Cloudflare.Worker("open-seo", {
       name: workerName(stage),
+      // The self-hosted Access application protects the stable hostname.
+      ...(authMode === "cloudflare_access" && stage === "selfhost"
+        ? { subdomain: { previewsEnabled: false } }
+        : {}),
       // Prod serves the real domains; the zone is inferred from the hostname.
       domain: prod
         ? ["app.openseo.so", "www.app.openseo.so"]
